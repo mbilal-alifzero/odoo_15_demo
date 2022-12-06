@@ -1,7 +1,7 @@
 <odoo>
 	<data>
 
-		<template id="zeeetec_external_layout_standard">
+		<template id="zeeetec_external_layout_standard_quotation">
 			<div t-attf-class="header o_company_#{company.id}_layout" t-att-style="report_header_style">
 				<div class="row">
 					<div class="col-6 mb4">
@@ -70,10 +70,10 @@
 			<t t-set="sale_order" t-value="doc"/>
 	
 			<t t-if="company.external_report_layout_id" t-call="{{company.external_report_layout_id.sudo().key}}"><t t-out="0"/></t>
-			<t t-else="else" t-call="zeeetec_reports.zeeetec_external_layout_standard"><t t-out="0"/></t>
+			<t t-else="else" t-call="zeeetec_reports.zeeetec_external_layout_standard_quotation"><t t-out="0"/></t>
 	
 		</template>
-		<template id="sale.report_saleorder_document">
+		<template id="document_zeeetec_quotation">
 			<t t-call="zeeetec_reports.quotation_external_layout">
 				<t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)" />
 				<t t-set="forced_vat" t-value="doc.fiscal_position_id.foreign_vat"/> <!-- So that it appears in the footer of the report instead of the company VAT if it's set -->
@@ -275,5 +275,22 @@
 				</div>
 			</t>
 		</template>
+		<template id="report_zeeetec_quotation">
+			<t t-call="web.html_container">
+
+				<t t-foreach="docs" t-as="doc">
+					<t t-call="zeeetec_reports.document_zeeetec_quotation" t-lang="doc.partner_id.lang"/>
+				</t>
+			</t>
+		</template>
+		<record id="action_report_sale_order_zeeetec" model="ir.actions.report">
+            <field name="name">Quoataion Zeeetec</field>
+            <field name="model">sale.order</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">zeeetec_reports.report_zeeetec_quotation</field>
+            <field name="report_file">zeeetec_reports.report_zeeetec_quotation</field>
+            <field name="binding_model_id" ref="sale.model_sale_order"/>
+            <field name="binding_type">report</field>
+        </record>
 	</data>
 </odoo>
