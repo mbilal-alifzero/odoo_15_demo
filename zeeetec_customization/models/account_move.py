@@ -6,6 +6,7 @@ class AccountMove(models.Model):
 
     ref_number = fields.Char(string="Reference#")
     remark = fields.Char(string="Remarks")
+    location = fields.Char(string="Location")
     credit_period = fields.Integer(string="Credit Period")
     total_item = fields.Integer(string="Total Item", compute="_compute_total_vals")
     total_qty = fields.Integer(string="Total Qty/Wt", compute="_compute_total_vals")

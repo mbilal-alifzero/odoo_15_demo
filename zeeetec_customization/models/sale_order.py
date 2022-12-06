@@ -6,6 +6,7 @@ class SaleOrder(models.Model):
 
     ref_number = fields.Char(string="Reference#")
     remark = fields.Char(string="Remarks")
+    location = fields.Char(string="Location")
     credit_period = fields.Integer(string="Credit Period")
     total_item = fields.Integer(string="Total Item", compute="_compute_total_vals")
     total_qty = fields.Integer(string="Total Qty/Wt", compute="_compute_total_vals")
@@ -25,6 +26,7 @@ class SaleOrder(models.Model):
             'ref_number': self.ref_number,
             'remark': self.remark,
             'credit_period': self.credit_period,
+            'location': self.location,
         })
         return invoice_vals
 

@@ -9,7 +9,6 @@
 					<button name="action_revision" states="sent" type="object" string="Revision"/>
 				</xpath>
 				
-
 				<xpath expr="//form/sheet/notebook/page[2]" position="after">
 					<page string="Revisions" attrs="{'invisible': [('old_revision_ids' , '=', [])]}">
 						<field name="old_revision_ids">

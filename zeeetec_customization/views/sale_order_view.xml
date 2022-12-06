@@ -9,6 +9,7 @@
 				<xpath expr="//field[@name='partner_id']" position="after">
 					<field name="ref_number" optional="hide"/>
 					<field name="remark" optional="hide"/>
+					<field name="location" optional="hide"/>
 				</xpath>
 			</field>
 		</record>
@@ -21,6 +22,7 @@
 				<xpath expr="//field[@name='partner_shipping_id']" position="after">
 					<field name="ref_number"/>
 					<field name="remark"/>
+					<field name="location"/>
 				</xpath>
 				<xpath expr="//field[@name='payment_term_id']" position="after">
 					<field name="credit_period"/>

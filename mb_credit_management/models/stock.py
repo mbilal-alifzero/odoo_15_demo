@@ -17,7 +17,7 @@ class StockPicking(models.Model):
         string="Hold Delivery", help="If True, then holds the DO until  \
             invoices are paid and equals to the total amount on the SO",
         search=_hold_picking_search
-    )
+        )
 
     def button_validate(self):
         """
