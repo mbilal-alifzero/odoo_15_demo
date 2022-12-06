@@ -15,7 +15,7 @@
 	"data": [
 		# 'security/ir.model.access.csv',
 		'views/client_order_reports.xml',
-		# 'views/sale_order_reports.xml',
+		'views/sale_order_reports.xml',
 		'views/delivery_order_reports.xml',
 		],
 	"auto_install": False,
