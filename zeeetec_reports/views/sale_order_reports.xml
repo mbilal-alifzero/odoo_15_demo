@@ -69,8 +69,7 @@
 			</t>
 			<t t-set="sale_order" t-value="doc"/>
 	
-			<t t-if="company.external_report_layout_id" t-call="{{company.external_report_layout_id.sudo().key}}"><t t-out="0"/></t>
-			<t t-else="else" t-call="zeeetec_reports.zeeetec_external_layout_standard_quotation"><t t-out="0"/></t>
+			<t t-call="zeeetec_reports.zeeetec_external_layout_standard_quotation"><t t-out="0"/></t>
 	
 		</template>
 		<template id="document_zeeetec_quotation">
@@ -284,7 +283,7 @@
 			</t>
 		</template>
 		<record id="action_report_sale_order_zeeetec" model="ir.actions.report">
-            <field name="name">Quoataion Zeeetec</field>
+            <field name="name">Quotation Zeeetec</field>
             <field name="model">sale.order</field>
             <field name="report_type">qweb-pdf</field>
             <field name="report_name">zeeetec_reports.report_zeeetec_quotation</field>
