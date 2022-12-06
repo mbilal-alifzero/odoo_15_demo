@@ -1,0 +1,339 @@
+<odoo>
+	<data>
+
+		
+		<template id="zeeetec_external_layout_standard">
+			<div t-attf-class="header o_company_#{company.id}_layout" t-att-style="report_header_style">
+				<div class="row">
+					<div class="col-6 mb4">
+						<img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="max-height: 120px;" alt="Logo"/>
+					</div>
+					<div class="col-3 mb4 text-center mt2" style="padding-top:60px;padding-left:0px;font-family: cambria;">
+						<div t-if="report_type == 'pdf'" class="text-center" style="border-radius: 16px;padding-left:0px;border:2px black solid;margin-top:20px">
+							<b>
+								Extra Demand Order
+							</b>
+						</div>
+					</div>
+					<div class="col-3 mb4 text-center mt2" style="padding-top:60px;padding-left:0px;font-family: cambria;">
+						<div t-if="report_type == 'pdf'" class="text-center" style="border-radius: 16px;border:2px black solid;padding-left:0px;margin-top:20px">
+							<b>
+								Page <span class="page"/> of <span class="topage"/>
+							</b>
+						</div>
+					</div>
+				</div>
+			</div>
+	
+			<div t-attf-class="article o_report_layout_standard o_company_#{company.id}_layout {{  'o_layout_background' if company.layout_background in ['Geometric', 'Custom']  else  '' }}" t-attf-style="background-image: url({{ 'data:image/png;base64,%s' % company.layout_background_image.decode('utf-8') if company.layout_background_image and company.layout_background == 'Custom' else '/base/static/img/bg_background_template.jpg' if company.layout_background == 'Geometric' else ''}});" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
+				<div >
+					<!-- This div ensures that the address is not cropped by the header. -->
+					<t t-call="web.address_layout"/>
+				</div>
+				<t t-out="0"/>
+			</div>
+	
+			<div t-attf-class="footer o_standard_footer o_company_#{company.id}_layout">
+				<div class="row">
+					<div class="col-9" style="font-family: cambria;font-size:23px;">
+						<span t-field="company.partner_id.street"/>,
+						<span t-field="company.partner_id.street2"/>,
+						<span t-field="company.partner_id.city"/>.
+					</div>
+					<div class="col-3 text-right" style="font-family: cambria;font-size:16px;">
+						Print Date &amp; Time: <br/><span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d-%b-%Y %I:%M:%S %p')"/>   
+					</div>
+				</div>
+				<div class="row" style="background-color:#01aef0;font-color:white;font-family: cambria;font-size:26px">
+					<div class="col-4 text-left" style="color:white">Phone: <span t-field="company.partner_id.phone"/></div>
+					<div class="col-4 text-center" style="color:white">Email: <span t-field="company.partner_id.email"/></div>
+					<div class="col-4 text-right" style="color:white">Web: <span  t-raw="company.partner_id.website.replace('http://','')"/></div>
+				</div>
+			</div>
+		</template>
+
+
+		<template id="quotation_external_layout">
+			<t t-if="not o" t-set="o" t-value="doc"/>
+	
+			<t t-if="not company">
+				<!-- Multicompany -->
+				<t t-if="company_id">
+					<t t-set="company" t-value="company_id"/>
+				</t>
+				<t t-elif="o and 'company_id' in o and o.company_id.sudo()">
+					<t t-set="company" t-value="o.company_id.sudo()"/>
+				</t>
+				<t t-else="else">
+					<t t-set="company" t-value="res_company"/>
+				</t>
+			</t>
+			<t t-set="sale_order" t-value="doc"/>
+	
+			<t t-if="company.external_report_layout_id" t-call="{{company.external_report_layout_id.sudo().key}}"><t t-out="0"/></t>
+			<t t-else="else" t-call="zeeetec_reports.zeeetec_external_layout_standard"><t t-out="0"/></t>
+	
+		</template>
+		<template id="stock_report_delivery_aggregated_move_lines">
+			<tr t-foreach="aggregated_lines" t-as="line">
+				<td class="text-center"><t t-esc="line_index + 1"/></td>
+				<td class="text-center">1234</td>
+				<td>
+					<span t-esc="aggregated_lines[line]['name']"/>
+					<p t-if="aggregated_lines[line]['description']">
+						<span t-esc="aggregated_lines[line]['description']"/>
+					</p>
+				</td>
+				<td class="text-center">
+					<span t-esc="aggregated_lines[line]['product_uom']"/>
+				</td>
+				<td class="text-center" name="move_line_aggregated_qty_ordered">
+					<span t-esc="'%.0f'% aggregated_lines[line]['qty_ordered']"/>
+					</td>
+				<td class="text-center" name="move_line_aggregated_qty_done">
+					<t t-if="aggregated_lines[line]['qty_done']">
+						<span t-esc="'%.0f'% aggregated_lines[line]['qty_done']"/>
+					</t>
+				</td>
+				<td class="text-center" name="move_line_aggregated_qty_done">
+					<t t-if="aggregated_lines[line]['qty_done']">
+						<span t-esc="'%.0f'% aggregated_lines[line]['qty_done']"/>
+					</t>
+				</td>
+			</tr>
+		</template>
+		<template id="report_delivery_document">
+			<t t-call="web.html_container">
+
+			<t t-call="zeeetec_reports.quotation_external_layout">
+				<t t-set="o" t-value="o.with_context(lang=o.partner_id.lang)" />
+
+				<div class="page">
+					<style>
+						@font-face {
+							font-family: cambria;
+							src: url(/zeeetec_reports/static/font/Cambria-Font-For-Linux.ttf);
+						}
+						*{
+							font-family: cambria;
+							font-size: 11px
+						}
+						.table tr th{
+							border-color: black;
+							vertical-align: center;
+						}
+						.table tr td{
+							vertical-align: center;
+							border-color: black;
+						}
+					</style>
+					<table class="table table-board table-sm border border-dark" style="border-collapse: separate;border-radius: 25px;">
+						<tr>
+							<th style="width:17%;border-top:0px"  >Client Order# </th>
+							<td class="border-right border-dark" style="width:33%;border-top:0px"><span t-field="o.name"/></td> 
+							<th style="width:15%;border-top:0px">DO Validity Date:</th>
+							<td style="border-top:0px;"><span t-field="o.date_done"/></td>
+						</tr>
+						<tr>
+							<th>Delivery Order# </th>
+							<td class="border-right border-dark"><span t-field="o.origin"/></td>
+							<th>Client Name:</th>
+							<td><span t-field="o.partner_id"/></td>
+						</tr>
+						<tr>
+							<th>Client Order Date: </th>
+							<td class="border-right border-dark"><span t-field="o.scheduled_date"/></td>
+							<th>Order Type:</th>
+							<td>Pick Up</td>
+						</tr>
+						<tr>
+							<th>Delivery Order Date: </th>
+							<td class="border-right border-dark"><span t-field="o.scheduled_date"/></td>
+							<th>Delivery Location:</th>
+							<td>ABC</td>
+						</tr>
+						
+						
+					</table>
+					
+					<br/>
+					
+					<table class="table table-sm o_main_table border-dark table-bordered" t-if="o.move_line_ids and o.state=='done'" name="stock_move_line_table">
+                        <t t-set="has_serial_number" t-value="False"/>
+                        <t t-set="has_serial_number" t-value="o.move_line_ids.mapped('lot_id')" groups="stock.group_lot_on_delivery_slip"/>
+                        <thead>
+                            <tr style="background-color:#01aef0;color:white;">
+								<th class="text-center">SR.</th>
+								<th class="text-center">Barcode</th>
+                                <th name="th_sml_product" class="text-center"><strong>Product Name</strong></th>
+                                <t name="lot_serial" t-if="has_serial_number">
+                                    <th>
+                                        Lot/Serial Number
+                                    </th>
+                                </t>
+
+								<th name="th_sml_quantity" class="text-center"><strong>Unit</strong></th>
+                                <th name="th_sml_qty_ordered" class="text-center" t-if="not has_serial_number">
+                                    <strong>CO Qty</strong>
+                                </th>
+                                <th name="th_sml_quantity" class="text-center"><strong>DO Qty</strong></th>
+                                <th name="th_sml_quantity" class="text-center"><strong>ED Qty</strong></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <!-- This part gets complicated with different use cases (additional use cases in extensions of this report):
+                                1. If serial numbers are used and set to print on delivery slip => print lines as is, otherwise group them by overlapping
+                                    product + description + uom combinations
+                                2. If any packages are assigned => split products up by package (or non-package) and then apply use case 1 -->
+                            <!-- If has destination packages => create sections of corresponding products -->
+                            <t t-if="o.has_packages" name="has_packages">
+                                <t t-set="packages" t-value="o.move_line_ids.mapped('result_package_id')"/>
+                                <t t-foreach="packages" t-as="package">
+                                    <t t-call="stock.stock_report_delivery_package_section_line"/>
+                                    <t t-set="package_move_lines" t-value="o.move_line_ids.filtered(lambda l: l.result_package_id == package)"/>
+                                    <!-- If printing lots/serial numbers => keep products in original lines -->
+                                    <t t-if="has_serial_number">
+                                        <tr t-foreach="package_move_lines" t-as="move_line">
+                                            <t t-call="stock.stock_report_delivery_has_serial_move_line"/>
+                                        </tr>
+                                    </t>
+                                    <!-- If not printing lots/serial numbers => merge lines with same product+description+uom -->
+                                    <t t-else="">
+                                        <t t-set="aggregated_lines" t-value="package_move_lines._get_aggregated_product_quantities(strict=True)"/>
+                                        <t t-call="zeeetec_reports.stock_report_delivery_aggregated_move_lines"/>
+                                    </t>
+                                </t>
+                                <!-- Make sure we do another section for package-less products if they exist -->
+                                <t t-set="move_lines" t-value="o.move_line_ids.filtered(lambda l: not l.result_package_id)"/>
+                                <t t-set="aggregated_lines" t-value="o.move_line_ids._get_aggregated_product_quantities(except_package=True)"/>
+                                <t t-if="move_lines or aggregated_lines" name="no_package_move_lines">
+                                    <t t-call="stock.stock_report_delivery_no_package_section_line" name="no_package_section"/>
+                                    <t t-if="has_serial_number">
+                                        <tr t-foreach="move_lines" t-as="move_line">
+                                            <t t-call="stock.stock_report_delivery_has_serial_move_line"/>
+                                        </tr>
+                                    </t>
+                                    <t t-elif="aggregated_lines">
+                                        <t t-call="zeeetec_reports.stock_report_delivery_aggregated_move_lines"/>
+                                    </t>
+                                </t>
+                            </t>
+                            <!-- No destination packages -->
+                            <t t-else="">
+                                <!-- If printing lots/serial numbers => keep products in original lines -->
+                                <t t-if="has_serial_number">
+                                    <tr t-foreach="o.move_line_ids" t-as="move_line">
+                                        <t t-call="stock.stock_report_delivery_has_serial_move_line"/>
+                                    </tr>
+                                </t>
+                                <!-- If not printing lots/serial numbers => merge lines with same product -->
+                                <t t-else="" name="aggregated_move_lines">
+                                    <t t-set="aggregated_lines" t-value="o.move_line_ids._get_aggregated_product_quantities()"/>
+                                    <t t-call="zeeetec_reports.stock_report_delivery_aggregated_move_lines"/>
+                                </t>
+                            </t>
+                        </tbody>
+                    </table>
+					<!-- Is there a discount on at least one line? -->
+					<table class="table table-sm o_main_table border-dark " style="display:none">
+						<tr style="border:0px">
+							<td colspan="3" rowspan="4" style="border:0px">
+							</td>
+						</tr>
+						<tr>
+							<td colspan="6" style="border:0px"></td>
+							<th style="border:1px solid black;width:15%">CO Qty:</th>
+							<td class="text-center" colspan="2" style="border:1px solid black;width:15%">100</td>
+						</tr>
+						<tr>
+							<td colspan="6" style="border:0px"></td>
+							<th style="border:1px solid black;">DO Qty:</th>
+							<td class="text-center" colspan="2" style="border:1px solid black;">100</td>
+						</tr>
+						<tr style="border:0px">
+							<td colspan="6" style="border:0px"></td>
+							<th style="border:1px solid black;">Total Items:</th>
+							<td class="text-center" colspan="2" style="border:1px solid black;"> 1</td>
+						</tr>
+					</table>
+					<div class="row" style="padding-top:20px">
+                        
+						
+						<div class="col-2 text-right">
+                            <b>CO Qty:</b>
+                        </div>
+						<div class="col-1 text-center">
+                            <p class="border-bottom border-dark">
+                                1
+                            </p>
+                        </div>
+						<div class="col-2 text-right">
+						<b>DO Qty:</b>
+                        </div>
+						<div class="col-1 text-center">
+                            <p class="border-bottom border-dark">
+                                1
+                            </p>
+                        </div>
+						<div class="col-2 text-right">
+						<b>ED Qty:</b>
+                        </div>
+						<div class="col-1 text-center">
+                            <p class="border-bottom border-dark">
+                                1
+                            </p>
+                        </div>
+						<div class="col-2 text-right">
+						<b>Total Items:</b>
+                        </div>
+						<div class="col-1 text-center">
+                            <p class="border-bottom border-dark">
+                                1
+                            </p>
+                        </div>
+                    </div>
+
+					<div class="row" style="padding-top:100px">
+                        
+                        <div class="col-3 text-center">
+                            <b class="border-top border-dark">
+                                Receiver Name
+                            </b>
+                        </div>
+						<div class="col-3 text-center">
+                            <b class="border-top border-dark">
+                                Receiver Contact#
+                            </b>
+                        </div>
+						<div class="col-3 text-center">
+                            <b class="border-top border-dark"> 
+                                Signature And Stamp
+                            </b>
+                        </div>
+						<div class="col-3 text-center">
+                            <b class="border-top border-dark">
+                                Zeeetec Representative
+                            </b>
+                        </div>
+                    </div>
+				</div>
+			</t>
+			</t>
+		</template>
+
+		<template id="report_deliveryslip">
+			<t t-foreach="docs" t-as="o">
+				<t t-call="zeeetec_reports.report_delivery_document" t-lang="o.partner_id.lang"/>
+			</t>
+		</template>
+		<record id="action_report_delivery_order_zeeetec" model="ir.actions.report">
+            <field name="name">Delivery Order Zeeetec</field>
+            <field name="model">stock.picking</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">zeeetec_reports.report_deliveryslip</field>
+            <field name="report_file">zeeetec_reports.report_deliveryslip</field>
+            <field name="binding_model_id" ref="stock.model_stock_picking"/>
+            <field name="binding_type">report</field>
+        </record>
+	</data>
+</odoo>

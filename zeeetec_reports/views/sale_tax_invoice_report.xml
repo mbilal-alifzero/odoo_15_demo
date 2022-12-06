@@ -5,7 +5,7 @@
 			<div t-attf-class="header o_company_#{company.id}_layout" t-att-style="report_header_style">
 				<div class="row">
 					<div class="col-6 mb4">
-						<img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="max-height: 45px;" alt="Logo"/>
+						<img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="max-height: 90px;" alt="Logo"/>
 					</div>
                     <div class="col-6 text-right">
                         <ul class="list-unstyled">
@@ -63,13 +63,29 @@
             <t t-call="zeeetec_reports.sti_external_layout">
                 <t t-set="doc" t-value="o.with_context(lang=lang)" />
                 <t t-set="o" t-value="o.with_context(lang=lang)" />
-                <t t-set="forced_vat" t-value="o.fiscal_position_id.foreign_vat"/> So that it appears in the footer of the report instead of the company VAT if it's set
+                <t t-set="forced_vat" t-value="o.fiscal_position_id.foreign_vat"/>
                 <div class="page">
+                    <style>
+						@font-face {
+							font-family: cambria;
+							src: url(/zeeetec_reports/static/font/Cambria-Font-For-Linux.ttf);
+						}
+						*{
+							font-family: cambria;
+							font-size: 11px
+						}
+						.table tr th{
+							border-color: black;
+						}
+						.table tr td{
+							border-color: black;
+						}
+					</style>
                     <h4 class="text-center">
                         <i>SALE TAX INVOICE</i>
 					</h4>
                     
-                    <table class="table table-sm table-borderless border border-dark" style="margin:8px">
+                    <table class="table table-sm table-borderless border border-dark rounded" style="margin:8px;border-radius: 25px;">
                         <tr>
                             <th>Customer: </th>
                             <td class="border-bottom border-dark"><span t-field="doc.partner_id.commercial_partner_id"/></td> 
@@ -132,6 +148,7 @@
                                 <th name="th_priceunit" t-attf-class="text-center {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}"><span>Unit Price</span></th>
                                 <th name="th_price_unit" t-if="display_discount" t-attf-class="text-center {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
                                     <span>Disc.%</span>
+                                    
                                 </th>
                                 <th name="th_taxes" t-attf-class="text-center {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}"><span>Taxes</span></th>
                                 <th name="th_subtotal" class="text-center">

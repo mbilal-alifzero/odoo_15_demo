@@ -10,7 +10,7 @@
 					<div class="col-3 mb4 text-center mt2" style="padding-top:60px;padding-left:0px;font-family: cambria;">
 						<div t-if="report_type == 'pdf'" class="text-center" style="border-radius: 16px;padding-left:0px;border:2px black solid;margin-top:20px">
 							<b>
-								Quotation
+								Client Order
 							</b>
 						</div>
 					</div>
@@ -96,50 +96,58 @@
 							border-color: black;
 						}
 					</style>
-
 					<table class="table table-board table-sm border border-dark" style="border-collapse: separate;border-radius: 25px;">
 						<tr>
-							<th  colspan="4" class="center text-center" style="border-top: none;"><b>Particulars Of Client </b></th>
+							<th colspan="2" class="text-center" style="border-top: none;font-size:18px;">Order Information</th>
+							<th colspan="2" class="text-center" style="border-top: none;font-size:18px;">Client Information</th>
+							<th colspan="2" class="text-center" style="border-top: none;font-size:18px;">Delivery Information</th>
 						</tr>
 						<tr>
-							<th style="width:14%" >Name: </th>
-							<td class="border-right border-dark" style="width:46%"><span t-field="doc.partner_id.commercial_partner_id"/></td> 
-							<th style="width:16%">Sales Representive:</th>
-							<td><span t-field="doc.user_id"/></td>
+							<th style="width:11.7%" >Order #: </th>
+							<td style="width:19%" class="border-right border-dark"><span t-field="doc.name"/></td>
+							<th style="width:13.5%" >Name: </th>
+							<td style="width:19%" class="border-right border-dark"><span t-field="doc.partner_id.commercial_partner_id"/></td> 
+							<th style="width:13.5%">Date:</th>
+							<td > <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%d-%b-%Y %I:%M %p')"/></td>
 						</tr>
 						<tr>
+							<th>Order Date: </th>
+							<td class="border-right border-dark"> <span t-esc="context_timestamp(doc.date_order).strftime('%d-%b-%Y %I:%M %p')"/></td>
 							<th>Contact Person: </th>
 							<td class="border-right border-dark"><span t-field="doc.partner_id.name"/></td>
-							<th>Contact Number:</th>
-							<td><span t-field="doc.user_id.mobile"/></td>
+							<th>Warehouse:</th>
+							<td> (Missed HC)</td>
+							
 						</tr>
 						<tr>
+							<th>Delivery Type: </th>
+							<td class="border-right border-dark">Pick Up(HC)</td>
 							<th>Contact Number: </th>
 							<td class="border-right border-dark"><span t-field="doc.partner_id.mobile"/></td>
-							<th>Quotation Date:</th>
-							<td> <span t-field="doc.date_order"  t-options='{"widget": "date"}'/></td>
+							<th>Contact Person:</th>
+							<td> CP ()HC</td>
 						</tr>
 						<tr>
-							<th>Address: </th>
-							<td class="border-right border-dark">
-								<span t-field="doc.partner_id.street"/>
-								<span t-field="doc.partner_id.street2"/>
-								<span t-field="doc.partner_id.city"/>
-							</td>
-							<th>Validity Date:</th>
-							<td><span t-field="doc.validity_date"/></td>
+							<th>Received Via: </th>
+							<td class="border-right border-dark">On Phone#</td>
+							<th>Credit Period: </th>
+							<td class="border-right border-dark">30 (HC)</td>
+							<th>Contact Number:</th>
+							<td> CC ()</td>
 						</tr>
 						<tr>
-							<th>Location: </th>
-							<td class="border-right border-dark"><span t-field="doc.location"/></td>
-							<th>Quotation Number:</th>
-							<td> <span t-field="doc.name"/></td>
+							<th>PO#: </th>
+							<td class="border-right border-dark">123</td>
+							<th>Invoice Type: </th>
+							<td class="border-right border-dark"><span t-field="doc.partner_id.mobile"/></td>
+							<th>Location:</th>
+							<td> <span t-field="doc.location"/></td>
 						</tr>
 						
 					</table>
+					
 					<br/>
 					
-						<p style="font-size:18px;"><b style="font-size:18px;">With reference to your inquiry regarding our product(s), we are pleased to offer you the following Items.</b></p>
 					<!-- Is there a discount on at least one line? -->
 					<t t-set="display_discount" t-value="any(l.discount for l in doc.order_line)"/>
 		
@@ -147,13 +155,14 @@
 						<!-- In case we want to repeat the header, remove "display: table-row-group" -->
 						<thead style="display: table-row-group">
 							<tr style="background-color:#01aef0;color:white;">
-								<th name="th_sr" class="text-center" style="background-color:#01aef0;color:white;">SR.</th>
+								<th name="th_sr" class="text-center">SR.</th>
 								<th name="th_barcode" class="text-center">Barcode</th>
 								<th name="th_description" class="text-center">Product Name</th>
-								<th name="th_image" class="text-center">Image</th>
 								<th name="th_unit" class="text-center">Unit</th>
 								<th name="th_quantity" class="text-center">Quantity</th>
 								<th name="th_priceunit" class="text-center">Price</th>
+								<th name="th_discount" class="text-center">Discount</th>
+								<th name="th_net_sale_rate" class="text-center">Net Sale Rate</th>
 								<th name="th_subtotal" class="text-center">
 									<span groups="account.group_show_line_subtotals_tax_excluded">Amount</span>
 									<span groups="account.group_show_line_subtotals_tax_included">Total Price</span>
@@ -173,11 +182,6 @@
 										<td class="text-center"><span t-esc="line_index + 1 "/></td>
 										<td class="text-center"><span t-if="line.product_id" t-field="line.product_id.barcode"/></td>
 										<td name="td_name"><span t-field="line.name"/></td>
-										<td name="td_image_loop" class="text-center">
-											<t t-if="line.product_id.image_1920">
-												<img t-att-src="image_data_uri(line.product_id.image_1920)"   style="height:40px;"/>
-											</t>
-										</td>
 										<td name="td_quantity" class="text-center">
 											<span t-field="line.product_uom"/>
 										</td>
@@ -186,6 +190,12 @@
 										</td>
 										<td name="td_priceunit" class="text-center">
 											<span t-esc="'%.0f'% line.price_unit"/>
+										</td>
+										<td name="td_discount" class="text-center">
+											<span t-field="line.dis_amount"/>
+										</td>
+										<td name="td_net_rate" class="text-center">
+											<span t-esc="'%.0f'% (line.price_unit - line.dis_amount)"/>
 										</td>
 										<td name="td_subtotal" class="text-center o_price_total">
 											<span t-esc="'%.0f'% line.price_subtotal" groups="account.group_show_line_subtotals_tax_excluded"/>
@@ -218,19 +228,36 @@
 									</tr>
 								</t>
 							</t>
-							<tr>
-								<td colspan="5" style="border:0px"></td>
-								<th class="text-center">Tax</th>
-								<td class="text-center" colspan="2">375</td>
-							</tr>
-							<tr style="border:0px">
-								<td colspan="5" style="border:0px">
-									<b>In Words:</b> <t t-esc="doc.currency_id.amount_to_text(doc.amount_total)"/>
-								</td>
-								<th class="text-center">Net Amount</th>
-								<td class="text-center" colspan="2"><span t-esc="'%.0f'% doc.amount_total"/></td>
-							</tr>
+							
 						</tbody>
+					</table>
+					<table class="table table-sm o_main_table border-dark ">
+						<tr style="border:0px">
+							<td colspan="3" rowspan="5" style="border:0px">
+								<b>In Words:</b> 
+								<p style="max-width:80%"><t t-esc="doc.currency_id.amount_to_text(doc.partner_id.credit)"/></p>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="6" style="border:0px"></td>
+							<th style="border:1px solid black;width:15%">Tax:</th>
+							<td class="text-center" colspan="2" style="border:1px solid black;width:15%">375</td>
+						</tr>
+						<tr>
+							<td colspan="6" style="border:0px"></td>
+							<th style="border:1px solid black;">Total Amount:</th>
+							<td class="text-center" colspan="2" style="border:1px solid black;"><span t-esc="'%.0f'% doc.amount_total"/></td>
+						</tr>
+						<tr style="border:0px">
+							<td colspan="6" style="border:0px"></td>
+							<th style="border:1px solid black;">Advance:</th>
+							<td class="text-center" colspan="2" style="border:1px solid black;"> - </td>
+						</tr>
+						<tr style="border:0px">
+							<td colspan="6" style="border:0px"></td>
+							<th style="border:1px solid black;">Balance:</th>
+							<td class="text-center" colspan="2" style="border:1px solid black;"><span t-esc="'%.0f'% doc.partner_id.credit"/></td>
+						</tr>
 					</table>
 		
 					<div class="clearfix" name="so_total_summary" style="display:none;">
@@ -258,14 +285,8 @@
 					</div>
 		
 					<div class="oe_structure"/>
-					<div>
-						 <u>
-							<h4>Terms and Conditions:</h4>
-						</u>
-						<p t-field="doc.note" />
-
-					</div>
-					<p t-if="not is_html_empty(doc.payment_term_id.note)">
+					
+					<p t-if="not is_html_empty(doc.payment_term_id.note)" style="display:none">
 						<span t-field="doc.payment_term_id.note"/>
 					</p>
 					<p id="fiscal_position_remark" t-if="doc.fiscal_position_id and not is_html_empty(doc.fiscal_position_id.sudo().note)">
